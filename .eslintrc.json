@@ -1,3 +1,4 @@
 {
+  "plugins": ["auto-import"],
   "extends": "next/core-web-vitals"
 }
