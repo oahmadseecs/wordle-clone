@@ -2,26 +2,28 @@ import { HStack } from "@chakra-ui/react";
 import { InputBox } from "../InputBox";
 import { useState, useRef, useEffect } from 'react';
 
-const InputRow = () => {
+const InputRow = ({ setIsAttemptButtonDisabled }) => {
     const [wordValue, setWordValue] = useState("");
     const [boxesValues, setBoxesValues] = useState(["", "", "", "", ""])
     const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
-        console.log({ currentIndex });
-    }, [currentIndex]);
+        if (wordValue.length == 5) {
+            setIsAttemptButtonDisabled(false);
+        }
+    }, [wordValue]);
 
     const handleBoxInput = (value, index) => {
         boxesValues[index] = value;
         setBoxesValues([...boxesValues]);
-        setWordValue(boxesValues.join());
+        setWordValue(boxesValues.join(""));
         if (value) {
             setCurrentIndex(currentIndex + 1);
         }
 
     }
 
-    return <HStack>
+    return <HStack margin={1}>
         {
             boxesValues.map((value, i) => {
                 return <InputBox

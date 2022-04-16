@@ -5,21 +5,25 @@ function InputBox({ isFocusSet, index, value, handleBoxInput, setCurrentIndex, c
   const inputRef = useRef();
   const [isDisabled, setIsDisabled] = useState(false);
 
+  useEffect(() => {
+    if (isFocusSet) {
+      setFocus();
+    }
+  }, [isFocusSet])
+
   const setFocus = () => {
     inputRef.current.focus();
   }
 
+  // handle key press while this box is in focus
   const handleInputChange = (keyValue) => {
-    console.log({ value });
-    console.log({ keyValue })
     setIsDisabled(true);
-    const isLetter = keyValue >= "A" && keyValue <= "Z";
+    const isLetter = keyValue.length === 1 && keyValue >= "A" && keyValue <= "Z";
     const isBackSpace = ["BACKSPACE", "DELETE"].includes(keyValue);
-    if (!isLetter && !isBackSpace) {
+    if ((!isLetter && !isBackSpace) || currentIndex === 5) {
       setIsDisabled(false);
       return;
     }
-    console.log({ isBackSpace })
     // if its a letter
     if (isLetter && !isBackSpace) {
       handleBoxInput(keyValue, index);
@@ -36,21 +40,23 @@ function InputBox({ isFocusSet, index, value, handleBoxInput, setCurrentIndex, c
     setIsDisabled(false);
   }
 
-  useEffect(() => {
-    if (isFocusSet) {
-      setFocus();
-    }
-  }, [isFocusSet])
+  // handle manually focus on box with mouse click
+  const handleFocus = () => {
+    setCurrentIndex(index);
+  }
 
   return (
     <Input
-      width={"5ch"}
+      width={"3rem"}
       borderRadius={10}
       background="white"
       ref={el => inputRef.current = el}
       disabled={isDisabled}
       value={value}
       onKeyDown={(e) => handleInputChange(e.key.toUpperCase())}
+      onFocus={handleFocus}
+      onChange={() => { }}
+      padding={"0 auto"}
     />)
 };
 export { InputBox };
