@@ -1,7 +1,7 @@
 import { Input, Flex } from "@chakra-ui/react";
 import { useRef, useEffect, useState } from 'react';
 
-function InputBox({ isFocusSet, index, value, handleBoxInput, setCurrentIndex, currentIndex }) {
+function InputBox({ isFocusSet, index, value, handleBoxInput, setCurrentIndex, currentIndex, result }) {
   const inputRef = useRef();
   const [isDisabled, setIsDisabled] = useState(false);
 
@@ -14,6 +14,12 @@ function InputBox({ isFocusSet, index, value, handleBoxInput, setCurrentIndex, c
   const setFocus = () => {
     inputRef.current.focus();
   }
+
+  useEffect(() => {
+    if (result != undefined) {
+      setIsDisabled(true);
+    }
+  })
 
   // handle key press while this box is in focus
   const handleInputChange = (keyValue) => {
@@ -47,7 +53,7 @@ function InputBox({ isFocusSet, index, value, handleBoxInput, setCurrentIndex, c
 
   return (
     <Input
-      width={"3rem"}
+      width={"4rem"}
       borderRadius={10}
       background="white"
       ref={el => inputRef.current = el}
@@ -56,7 +62,13 @@ function InputBox({ isFocusSet, index, value, handleBoxInput, setCurrentIndex, c
       onKeyDown={(e) => handleInputChange(e.key.toUpperCase())}
       onFocus={handleFocus}
       onChange={() => { }}
-      padding={"0 auto"}
+      textAlign="center"
+
+      _disabled={{
+        ...(result == 0 && { border: "4px solid black" }),
+        ...(result == 1 && { border: "4px solid yellow" }),
+        ...(result == 2 && { border: "4px solid green" })
+      }}
     />)
 };
 export { InputBox };

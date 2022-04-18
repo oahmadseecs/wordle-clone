@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react"
 
-const Footer = ({ FinishButton }) => {
+const Footer = ({ Button }) => {
     return <Box
         position={"fixed"}
         left={"0"}
@@ -10,9 +10,9 @@ const Footer = ({ FinishButton }) => {
         backgroundColor="transparent"
         display={"flex"}
         alignItems="flex-start"
-        justifyContent={"flex-end"}
+        justifyContent={"center"}
     >
-        <FinishButton />
+        <Button />
     </Box>
 }
 

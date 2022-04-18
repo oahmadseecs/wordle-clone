@@ -1,17 +1,21 @@
-import { HStack } from "@chakra-ui/react";
+import { HStack, VStack, Button } from "@chakra-ui/react";
 import { InputBox } from "../InputBox";
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
-const InputRow = ({ setIsAttemptButtonDisabled }) => {
+const InputRow = ({ setIsAttemptButtonDisabled, isAttemptButtonDisabled, handleAttempt, attempt, isGameOver }) => {
     const [wordValue, setWordValue] = useState("");
     const [boxesValues, setBoxesValues] = useState(["", "", "", "", ""])
     const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
-        if (wordValue.length == 5) {
+        if (wordValue.length == 5 && !isGameOver) {
             setIsAttemptButtonDisabled(false);
         }
     }, [wordValue]);
+
+    useEffect(() => {
+        console.log({ attempt });
+    }, [attempt])
 
     const handleBoxInput = (value, index) => {
         boxesValues[index] = value;
@@ -23,21 +27,54 @@ const InputRow = ({ setIsAttemptButtonDisabled }) => {
 
     }
 
-    return <HStack margin={1}>
-        {
-            boxesValues.map((value, i) => {
-                return <InputBox
-                    key={i}
-                    isFocusSet={currentIndex === i}
-                    index={i}
-                    value={value}
-                    handleBoxInput={handleBoxInput}
-                    setCurrentIndex={setCurrentIndex}
-                    currentIndex={currentIndex}
-                />
-            })
-        }
-    </HStack>
+    const handleAttemptButtonClick = () => {
+        handleAttempt(wordValue);
+    }
+
+    return attempt.state === "current" ? <VStack>
+        <HStack margin={1}>
+            {
+                boxesValues.map((value, i) => {
+                    return <InputBox
+                        key={i}
+                        isFocusSet={currentIndex === i}
+                        index={i}
+                        value={value}
+                        handleBoxInput={handleBoxInput}
+                        setCurrentIndex={setCurrentIndex}
+                        currentIndex={currentIndex}
+                    />
+                })
+            }
+        </HStack>
+        <Button
+            variant={"solid"}
+            colorScheme="green"
+            size={"sm"}
+            marginTop={"3"}
+            disabled={isAttemptButtonDisabled}
+            onClick={handleAttemptButtonClick}
+        >
+            Attempt
+        </Button>
+    </VStack>
+        :
+        <HStack>
+            {
+                boxesValues.map((value, i) => {
+                    return <InputBox
+                        key={i}
+                        isFocusSet={currentIndex === i}
+                        index={i}
+                        value={value}
+                        handleBoxInput={handleBoxInput}
+                        setCurrentIndex={setCurrentIndex}
+                        currentIndex={currentIndex}
+                        result={attempt.results.find(result => result.letter == value.toLowerCase()).state}
+                    />
+                })
+            }
+        </HStack>
 }
 
 export { InputRow };
