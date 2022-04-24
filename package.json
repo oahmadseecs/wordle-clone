@@ -14,6 +14,7 @@
     "@emotion/styled": "^11.8.1",
     "@fontsource/poppins": "^4.5.5",
     "@fontsource/raleway": "^4.5.5",
+    "axios": "^0.26.1",
     "framer-motion": "^6.2.10",
     "next": "12.1.5",
     "react": "18.0.0",

@@ -2,7 +2,7 @@ import { HStack, VStack, Button } from "@chakra-ui/react";
 import { InputBox } from "../InputBox";
 import { useState, useEffect } from 'react';
 
-const InputRow = ({ setIsAttemptButtonDisabled, isAttemptButtonDisabled, handleAttempt, attempt, isGameOver }) => {
+const InputRow = ({ setIsAttemptButtonDisabled, isAttemptButtonDisabled, handleAttempt, attempt, isGameOver, isGameUIDisabled }) => {
     const [wordValue, setWordValue] = useState("");
     const [boxesValues, setBoxesValues] = useState(["", "", "", "", ""])
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -14,8 +14,8 @@ const InputRow = ({ setIsAttemptButtonDisabled, isAttemptButtonDisabled, handleA
     }, [wordValue]);
 
     useEffect(() => {
-        console.log({ attempt });
-    }, [attempt])
+        console.log({ attempt })
+    }, [attempt]);
 
     const handleBoxInput = (value, index) => {
         boxesValues[index] = value;
@@ -43,6 +43,7 @@ const InputRow = ({ setIsAttemptButtonDisabled, isAttemptButtonDisabled, handleA
                         handleBoxInput={handleBoxInput}
                         setCurrentIndex={setCurrentIndex}
                         currentIndex={currentIndex}
+                        isGameUIDisabled={isGameUIDisabled}
                     />
                 })
             }
@@ -64,13 +65,13 @@ const InputRow = ({ setIsAttemptButtonDisabled, isAttemptButtonDisabled, handleA
                 boxesValues.map((value, i) => {
                     return <InputBox
                         key={i}
-                        isFocusSet={currentIndex === i}
                         index={i}
                         value={value}
                         handleBoxInput={handleBoxInput}
                         setCurrentIndex={setCurrentIndex}
                         currentIndex={currentIndex}
                         result={attempt.results.find(result => result.letter == value.toLowerCase()).state}
+                        isGameUIDisabled={isGameUIDisabled}
                     />
                 })
             }

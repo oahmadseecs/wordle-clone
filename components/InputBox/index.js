@@ -1,7 +1,7 @@
 import { Input, Flex } from "@chakra-ui/react";
 import { useRef, useEffect, useState } from 'react';
 
-function InputBox({ isFocusSet, index, value, handleBoxInput, setCurrentIndex, currentIndex, result }) {
+function InputBox({ isFocusSet, index, value, handleBoxInput, setCurrentIndex, currentIndex, result, isGameUIDisabled }) {
   const inputRef = useRef();
   const [isDisabled, setIsDisabled] = useState(false);
 
@@ -16,10 +16,13 @@ function InputBox({ isFocusSet, index, value, handleBoxInput, setCurrentIndex, c
   }
 
   useEffect(() => {
-    if (result != undefined) {
+    if (result != undefined || isGameUIDisabled) {
       setIsDisabled(true);
     }
-  })
+    else {
+      setIsDisabled(false);
+    }
+  }, [isGameUIDisabled, result])
 
   // handle key press while this box is in focus
   const handleInputChange = (keyValue) => {

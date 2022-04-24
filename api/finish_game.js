@@ -1,13 +1,16 @@
 import { Client } from "../components/Client";
 
-export const start_game = async () => {
-    return Client.post("api/v1/start_game/", {})
+export const finish_game = async ({ gameId, gameKey }) => {
+    return Client.post("api/v1/finish_game/", {
+        id: gameId,
+        key: gameKey
+    })
         .then((response) => {
             return response.data;
         })
         .then(data => {
             return {
-                ...data, isError: false, errorMessage: ""
+                answer: data.answer, isError: false, errorMessage: ""
             }
         })
         .catch((error) => {

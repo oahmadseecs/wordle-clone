@@ -3,8 +3,11 @@ import { InputRow } from "../components/InputRow";
 import { useState, useEffect } from "react";
 import { Footer } from "../components/Footer";
 import { start_game } from "../api/start_game";
-import { guess } from "../api/guess";
+import { FatalError, guess } from "../api/guess";
 import { Help } from "../components/InputRow/Help";
+import { ErrorBox } from "../components/ErrorBox";
+import { finish_game } from "../api/finish_game";
+import { useRouter } from "next/router";
 
 const attemptsObject = [
     {
@@ -53,9 +56,11 @@ const attemptsObject = [
 
 const Game = () => {
     // attempt can have three values: 'current', 'done', 'pending'
+    const router = useRouter();
     const [attempts, setAttempts] = useState(attemptsObject);
     const [isAttemptButtonDisabled, setIsAttemptButtonDisabled] = useState(true);
-    const [gameStartError, setGameStartError] = useState("");
+    const [isError, setIsError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     const [currentAttemptIndex, setCurrentAttemptIndex] = useState(0)
     const [gameCredentials, setGameCredentials] = useState({
         wordID: null,
@@ -64,12 +69,15 @@ const Game = () => {
     })
     const [isGameOver, setIsGameOver] = useState(false);
     const [gameOverMessage, setGameOverMessage] = useState("");
+    const [isGameUIDisabled, setIsGameUIDisabled] = useState(false);
 
     useEffect(() => {
         (async () => {
             const { id, key, wordID, isError, errorMessage } = await start_game();
             if (isError) {
-                setGameStartError(errorMessage);
+                setIsError(true);
+                setErrorMessage("Error starting game: " + errorMessage);
+                return;
             }
             setGameCredentials({
                 wordID: wordID,
@@ -77,8 +85,13 @@ const Game = () => {
                 gameKey: key,
             })
             console.log("Game Initialized", id, key, wordID);
+            setIsGameUIDisabled(false);
+            setIsError(false);
+            setErrorMessage("");
         })();
     }, []);
+
+
 
     const checkAnswer = (result) => {
         return result.every(result => result.state == 2);
@@ -91,12 +104,24 @@ const Game = () => {
     }
 
     const handleAttempt = async (wordValue) => {
-        const { results, isError, errorMessage } = await guess({ gameId: gameCredentials.gameId, key: gameCredentials.gameKey, value: wordValue.toLowerCase() });
+        const { results, isError, error } = await guess({ gameId: gameCredentials.gameId, key: gameCredentials.gameKey, value: wordValue.toLowerCase() });
         if (isError) {
-            attempts[currentAttempt].isError = true;
-            attempts[currentAttempt].errorMessage = errorMessage;
+            if (error instanceof FatalError) {
+                attempts[currentAttemptIndex].isError = true;
+                attempts[currentAttemptIndex].errorMessage = error.message;
+                setIsGameUIDisabled(true);
+                setIsGameOver(true);
+                setIsError(true);
+                setErrorMessage(error.message);
+            }
+            else {
+                setIsError(true);
+                setErrorMessage(error.message);
+            }
             return;
         }
+        setIsError(false);
+        setErrorMessage("");
 
         if (checkAnswer(results)) {
             handleSuccess();
@@ -124,8 +149,19 @@ const Game = () => {
 
     }
 
-    const FinishButton = () => <Button margin={25} colorScheme="red">Finish Game</Button>
-    const RestartButton = () => <Button margin={25} colorScheme="gray">Restart Game</Button>
+    const handleGameFinish = async () => {
+        const { answer, isError, errorMessage } = await finish_game({ gameId: gameCredentials.gameId, gameKey: gameCredentials.gameKey })
+        if (isError) {
+            setIsError(true);
+            setErrorMessage(errorMessage);
+            return;
+        }
+        setIsGameOver(true)
+        setGameOverMessage(`The correct answer for this wordle was ${answer}. Please try again, you can do it this time.`);
+    }
+
+    const FinishButton = () => <Button margin={25} colorScheme="red" onClick={handleGameFinish}>Finish Game</Button>
+    const RestartButton = () => <Button margin={25} colorScheme="gray" onClick={() => router.reload()}>Restart Game</Button>
 
 
     // TODO: Add proper error handling
@@ -138,19 +174,21 @@ const Game = () => {
             <Heading textAlign={"center"}>Welcome to Wordle-Clone</Heading>
             <Text textAlign="center">
                 Please guess the correct word, you have a total of 6 attempts to guess the word correctly. <b>Remember, only valid words are accepted.</b>
-
             </Text>
         </Container>
+        {
+            isError && <ErrorBox errorMessage={errorMessage}></ErrorBox>
+        }
         <Flex
             width={"100%"}
             flexDirection="row"
         >
-            <Flex flex="1" justify={"center"} alignItems="center">
+            {!isGameUIDisabled && <Flex flex="1" justify={"center"} alignItems="center">
                 <VStack>
                     <Heading size="lg">{isGameOver ? "SCORE" : "ATTEMPT"}</Heading>
                     <Heading size="xl">{currentAttemptIndex + 1} / {attempts.length}</Heading>
                 </VStack>
-            </Flex>
+            </Flex>}
             <Flex flex="1" flexDirection={"column"} justifyContent="center" alignItems={"center"}>
                 {isGameOver && <Text marginBottom={10} color={"green"}>
                     {gameOverMessage}
@@ -165,14 +203,15 @@ const Game = () => {
                                 isAttemptButtonDisabled={isAttemptButtonDisabled}
                                 handleAttempt={handleAttempt}
                                 isGameOver={isGameOver}
+                                isGameUIDisabled={isGameUIDisabled}
                             />
                         }
                     })
                 }
             </Flex>
-            <Flex flex="1">
+            {!isGameUIDisabled && <Flex flex="1">
                 <Help></Help>
-            </Flex>
+            </Flex>}
         </Flex >
 
         <Footer Button={!isGameOver ? FinishButton : RestartButton} />

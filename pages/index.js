@@ -1,7 +1,9 @@
 import { Button, Flex, Heading, Link, VStack } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 export default function Home() {
+  const router = useRouter();
   useEffect(() => {
     console.log("I fire once");
   }, [])
@@ -17,10 +19,12 @@ export default function Home() {
         </Heading>
 
         {/* Button to start game */}
-        <Button _hover={{
-          backgroundColor: "black",
-          color: "white"
-        }}>Start Game</Button>
+        <Button
+          onClick={() => router.push("/game")}
+          _hover={{
+            backgroundColor: "black",
+            color: "white"
+          }}>Start Game</Button>
 
       </VStack>
     </Flex>
