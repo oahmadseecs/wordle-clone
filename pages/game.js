@@ -84,7 +84,6 @@ const Game = () => {
                 gameId: id,
                 gameKey: key,
             })
-            console.log("Game Initialized", id, key, wordID);
             setIsGameUIDisabled(false);
             setIsError(false);
             setErrorMessage("");

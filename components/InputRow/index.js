@@ -12,11 +12,6 @@ const InputRow = ({ setIsAttemptButtonDisabled, isAttemptButtonDisabled, handleA
             setIsAttemptButtonDisabled(false);
         }
     }, [wordValue]);
-
-    useEffect(() => {
-        console.log({ attempt })
-    }, [attempt]);
-
     const handleBoxInput = (value, index) => {
         boxesValues[index] = value;
         setBoxesValues([...boxesValues]);

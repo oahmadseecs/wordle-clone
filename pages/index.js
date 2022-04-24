@@ -4,9 +4,6 @@ import { useEffect } from "react";
 
 export default function Home() {
   const router = useRouter();
-  useEffect(() => {
-    console.log("I fire once");
-  }, [])
   return (
     <Flex width={"100%"} marginTop={"10%"} flexDirection="column" justifyContent={"center"} alignItems="center">
       <VStack spacing={5}>
