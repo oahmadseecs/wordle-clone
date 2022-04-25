@@ -21,11 +21,17 @@ export const guess = async ({ value, gameId, key }) => {
         guess: value,
     })
         .then((response) => {
-            const statusCode = response.status;
-            if (statusCode === 200) {
-                return response.data;
+            return response.data;
+        })
+        .then(data => {
+            return {
+                results: [...data], isError: false, errorMessage: ""
             }
-            else if (statusCode === 400) {
+        })
+        .catch((error) => {
+            const statusCode = error.response.status;
+
+            if (statusCode === 400) {
                 throw new InvalidWordError("Invalid word, please enter a valid word!");
             }
             else if (statusCode === 403) {
@@ -34,11 +40,7 @@ export const guess = async ({ value, gameId, key }) => {
             else {
                 throw new FatalError("Something went wrong!");
             }
-        })
-        .then(data => {
-            return {
-                results: [...data], isError: false, errorMessage: ""
-            }
+
         })
         .catch((error) => {
             return {
